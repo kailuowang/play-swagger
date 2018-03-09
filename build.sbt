@@ -5,18 +5,16 @@ resolvers +=  Resolver.bintrayRepo("scalaz", "releases")
 
 
 lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
-  publishArtifact := false
+  skip in publish := true
 )
 
 lazy val root = project.in(file("."))
   .aggregate(playSwagger, sbtPlaySwagger)
   .settings(sourcesInBase := false)
-  .settings(noPublishSettings:_*)
+  .settings(noPublishSettings ++ commonSettings)
 
 lazy val playSwagger = project.in(file("core"))
-  .settings(Publish.coreSettings ++ Format.settings ++ Testing.settings)
+  .settings(Publish.coreSettings ++ Format.settings ++ Testing.settings ++ commonSettings)
   .settings(
     name := "play-swagger",
     libraryDependencies ++= Dependencies.playTest ++
@@ -24,7 +22,9 @@ lazy val playSwagger = project.in(file("core"))
       Dependencies.playJson ++
       Dependencies.test ++
       Dependencies.yaml,
-    scalaVersion := "2.12.4"
+    scalaVersion := "2.12.4",
+    crossScalaVersions := Seq( "2.11.12", scalaVersion.value),
+    releaseCrossBuild := true
   )
 
 lazy val sbtPlaySwagger = project.in(file("sbtPlugin"))
